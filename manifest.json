@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Image Selector Downloader",
+  "version": "0.1.0",
+  "description": "输入 CSS 选择器高亮图片，并打包下载为 zip。",
+  "action": {
+    "default_title": "Image Downloader"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "permissions": ["activeTab", "downloads", "scripting", "offscreen", "sidePanel"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
+

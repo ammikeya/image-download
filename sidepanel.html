@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Image Downloader</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="title">图片选择器下载</div>
+
+      <label class="label" for="selector">CSS 选择器</label>
+      <input
+        id="selector"
+        class="input"
+        type="text"
+        placeholder="例如：.gallery img 或 img.hero"
+        autocomplete="off"
+      />
+
+      <div class="row">
+        <button id="btnHighlight" class="btn btnSecondary" type="button">
+          高亮
+        </button>
+        <button id="btnDownload" class="btn btnPrimary" type="button">
+          下载 zip
+        </button>
+      </div>
+
+      <div class="meta">
+        <div>匹配数量：<span id="count">0</span></div>
+      </div>
+
+      <div id="status" class="status" aria-live="polite"></div>
+    </div>
+
+    <script src="sidepanel.js"></script>
+  </body>
+</html>
+

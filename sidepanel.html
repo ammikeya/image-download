@@ -8,29 +8,38 @@
   </head>
   <body>
     <div class="wrap">
-      <div class="title">图片选择器下载</div>
+      <div class="title">图片点击下载</div>
 
-      <label class="label" for="selector">CSS 选择器</label>
-      <input
-        id="selector"
-        class="input"
-        type="text"
-        placeholder="例如：.gallery img 或 img.hero"
-        autocomplete="off"
-      />
+      <div class="hint">
+        点击“进入选择模式”，然后在网页中点击一个或多个元素以选择图片。
+      </div>
 
       <div class="row">
-        <button id="btnHighlight" class="btn btnSecondary" type="button">
-          高亮
+        <button id="btnPick" class="btn btnSecondary" type="button">
+          进入选择模式
         </button>
-        <button id="btnDownload" class="btn btnPrimary" type="button">
+        <button id="btnStop" class="btn btnSecondary" type="button">
+          退出选择模式
+        </button>
+      </div>
+
+      <div class="row">
+        <button id="btnClear" class="btn btnSecondary" type="button">
+          清空已选
+        </button>
+				<button id="btnDownload" class="btn btnPrimary" type="button">
           下载 zip
         </button>
       </div>
 
       <div class="meta">
-        <div>匹配数量：<span id="count">0</span></div>
+        <div>已选图片：<span id="count">0</span></div>
       </div>
+
+      <label class="toggle">
+        <input id="toggleGroupPick" type="checkbox" checked />
+        <span>按组选择（轮播/图集）</span>
+      </label>
 
       <div id="status" class="status" aria-live="polite"></div>
     </div>

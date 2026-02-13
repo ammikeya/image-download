@@ -13,6 +13,11 @@
   margin-bottom: 10px;
 }
 
+.hint {
+  color: #57606a;
+  margin-bottom: 10px;
+}
+
 .label {
   display: block;
   font-weight: 600;
@@ -69,6 +74,20 @@
   color: #57606a;
 }
 
+.toggle {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #111;
+  user-select: none;
+}
+
+.toggle input {
+  width: 14px;
+  height: 14px;
+}
+
 .status {
   margin-top: 10px;
   min-height: 18px;
@@ -97,5 +116,9 @@ body {
   width: auto;
   min-width: 0;
   padding: 14px;
+}
+
+.row + .row {
+  margin-top: 8px;
 }
 

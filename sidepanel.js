@@ -4,8 +4,41 @@ function setStatus(text, kind = "") {
   el.className = `status${kind ? " " + kind : ""}`;
 }
 
+const THEME_KEY = "imgdl_theme"; // "light" | "dark"
+
+function getSystemTheme() {
+  return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
+}
+
+function getEffectiveTheme() {
+  const t = document.documentElement.dataset.theme;
+  if (t === "dark" || t === "light") return t;
+  return getSystemTheme();
+}
+
+function applyTheme(theme) {
+  if (theme === "dark" || theme === "light") {
+    document.documentElement.dataset.theme = theme;
+  } else {
+    delete document.documentElement.dataset.theme;
+  }
+}
+
+function updateThemeButton() {
+  const btn = document.getElementById("btnTheme");
+  if (!btn) return;
+  const current = getEffectiveTheme();
+  const next = current === "dark" ? "light" : "dark";
+  btn.textContent = next === "dark" ? "深色" : "浅色";
+  btn.title = next === "dark" ? "切换到深色模式" : "切换到浅色模式";
+}
+
 function setCount(n) {
-  document.getElementById("count").textContent = String(n ?? 0);
+  const v = String(n ?? 0);
+  const countEl = document.getElementById("count");
+  if (countEl) countEl.textContent = v;
+  const badgeEl = document.getElementById("badgeCount");
+  if (badgeEl) badgeEl.textContent = v;
 }
 
 async function getActiveTab() {
@@ -87,11 +120,13 @@ function setBusy(isBusy) {
   const btnStop = document.getElementById("btnStop");
   const btnClear = document.getElementById("btnClear");
   const toggleGroupPick = document.getElementById("toggleGroupPick");
+  const btnTheme = document.getElementById("btnTheme");
   btnDownload.disabled = isBusy;
   btnPick.disabled = isBusy || pickMode;
   btnStop.disabled = isBusy || !pickMode;
   btnClear.disabled = isBusy;
   toggleGroupPick.disabled = isBusy;
+  if (btnTheme) btnTheme.disabled = isBusy;
 }
 
 async function setPickOptionsOnPage(tab, opts) {
@@ -132,11 +167,55 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnStop = document.getElementById("btnStop");
   const btnClear = document.getElementById("btnClear");
   const toggleGroupPick = document.getElementById("toggleGroupPick");
+  const btnTheme = document.getElementById("btnTheme");
 
   setCount(0);
   setStatus("");
   setPickMode(false);
   toggleGroupPick.checked = true;
+  updateThemeButton();
+
+  // Load persisted theme (best-effort).
+  try {
+    chrome.storage.local.get([THEME_KEY], (res) => {
+      const t = res?.[THEME_KEY];
+      if (t === "dark" || t === "light") applyTheme(t);
+      updateThemeButton();
+    });
+  } catch {
+    // ignore
+  }
+
+  // Keep label in sync with system theme if user hasn't chosen one.
+  try {
+    const mm = window.matchMedia?.("(prefers-color-scheme: dark)");
+    mm?.addEventListener?.("change", () => {
+      if (!document.documentElement.dataset.theme) updateThemeButton();
+    });
+  } catch {
+    // ignore
+  }
+
+  btnTheme?.addEventListener("click", async () => {
+    setBusy(true);
+    setStatus("");
+    try {
+      const current = getEffectiveTheme();
+      const next = current === "dark" ? "light" : "dark";
+      applyTheme(next);
+      updateThemeButton();
+      try {
+        await chrome.storage.local.set({ [THEME_KEY]: next });
+      } catch {
+        // ignore persistence issues
+      }
+      setStatus(next === "dark" ? "已切换到深色模式" : "已切换到浅色模式", "ok");
+    } catch (e) {
+      setStatus(String(e?.message || e), "error");
+    } finally {
+      setBusy(false);
+    }
+  });
 
   // Each time the panel is opened (hidden -> visible), reset to initial state.
   let wasHidden = document.hidden;

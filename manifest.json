@@ -1,15 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "Image Selector Downloader",
+  "name": "Image Downloader",
   "version": "0.1.0",
-  "description": "输入 CSS 选择器高亮图片，并打包下载为 zip。",
+  "description": "Select the image on the page and then download it.",
   "action": {
     "default_title": "Image Downloader"
   },
   "side_panel": {
     "default_path": "sidepanel.html"
   },
-  "permissions": ["activeTab", "downloads", "scripting", "offscreen", "sidePanel"],
+  "permissions": ["activeTab", "downloads", "scripting", "offscreen", "sidePanel", "storage"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"

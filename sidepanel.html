@@ -8,7 +8,17 @@
   </head>
   <body>
     <div class="wrap">
-      <div class="title">图片点击下载</div>
+      <div class="topbar">
+        <div class="title">图片点击下载</div>
+        <div class="topbarRight">
+          <div class="badge" aria-label="已选图片数量">
+            <span id="badgeCount">0</span>
+          </div>
+          <button id="btnTheme" class="chip" type="button" aria-label="切换主题">
+            深色
+          </button>
+        </div>
+      </div>
 
       <div class="hint">
         点击“进入选择模式”，然后在网页中点击一个或多个元素以选择图片。
@@ -27,7 +37,7 @@
         <button id="btnClear" class="btn btnSecondary" type="button">
           清空已选
         </button>
-				<button id="btnDownload" class="btn btnPrimary" type="button">
+        <button id="btnDownload" class="btn btnPrimary" type="button">
           下载 zip
         </button>
       </div>

@@ -5,12 +5,12 @@
   const HIGHLIGHT_ATTR = "data-imgdl-highlight";
   const PICK_SELECTED_ATTR = "data-imgdl-picked";
   const PICK_HOVER_ATTR = "data-imgdl-hover";
-  const OUTLINE_STYLE = "2px solid #d1242f";
+  // Use modern, high-contrast colors aligned with the side panel theme.
+  const OUTLINE_STYLE = "2px solid #ef4444";
   const OUTLINE_OFFSET = "2px";
-  const HOVER_OUTLINE_STYLE = "2px solid #0969da";
+  const HOVER_OUTLINE_STYLE = "2px solid #2563eb";
 
   let pickModeEnabled = false;
-  let currentSelector = "";
   let groupPickEnabled = true;
   const pickedUrlSet = new Set();
   const pickedImgSet = new Set();

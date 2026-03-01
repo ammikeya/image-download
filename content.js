@@ -14,20 +14,42 @@
   let groupPickEnabled = true;
   const pickedUrlSet = new Set();
   const pickedImgSet = new Set();
-  let hoverEl = null;
+  /** @type {Element|null} */
+  let hoverKey = null;
+  /** @type {Set<HTMLImageElement>} */
+  let hoverImgs = new Set();
 
-  function setHover(el) {
-    if (hoverEl === el) return;
-    if (hoverEl && hoverEl instanceof Element) {
-      hoverEl.removeAttribute(PICK_HOVER_ATTR);
-      hoverEl.style.outline = "";
-      hoverEl.style.outlineOffset = "";
+  function restoreImgBaseOutline(img) {
+    if (!(img instanceof HTMLImageElement)) return;
+    const selected = img.getAttribute(PICK_SELECTED_ATTR) === "1";
+    const highlighted = img.getAttribute(HIGHLIGHT_ATTR) === "1";
+    if (selected || highlighted) {
+      img.style.outline = OUTLINE_STYLE;
+      img.style.outlineOffset = OUTLINE_OFFSET;
+    } else {
+      img.style.outline = "";
+      img.style.outlineOffset = "";
     }
-    hoverEl = el;
-    if (hoverEl && hoverEl instanceof Element) {
-      hoverEl.setAttribute(PICK_HOVER_ATTR, "1");
-      hoverEl.style.outline = HOVER_OUTLINE_STYLE;
-      hoverEl.style.outlineOffset = OUTLINE_OFFSET;
+  }
+
+  function setHoverImgs(nextKey, nextImgs) {
+    if (hoverKey === nextKey) return;
+
+    // clear previous hover
+    for (const img of hoverImgs) {
+      img.removeAttribute(PICK_HOVER_ATTR);
+      restoreImgBaseOutline(img);
+    }
+
+    hoverKey = nextKey;
+    hoverImgs = new Set(nextImgs || []);
+
+    // apply new hover
+    for (const img of hoverImgs) {
+      if (!(img instanceof HTMLImageElement)) continue;
+      img.setAttribute(PICK_HOVER_ATTR, "1");
+      img.style.outline = HOVER_OUTLINE_STYLE;
+      img.style.outlineOffset = OUTLINE_OFFSET;
     }
   }
 
@@ -114,12 +136,26 @@
     if (!pickModeEnabled) return;
     const t = ev.target;
     if (!(t instanceof Element)) return;
-    setHover(t);
+
+    /** @type {HTMLImageElement|null} */
+    const img = t instanceof HTMLImageElement ? t : t.closest?.("img");
+    if (!img) {
+      setHoverImgs(null, []);
+      return;
+    }
+
+    if (groupPickEnabled) {
+      const group = findBestGroupContainer(img) || img;
+      setHoverImgs(group, collectImgsFromElement(group));
+      return;
+    }
+
+    setHoverImgs(img, [img]);
   }
 
   function onPointerOut() {
     if (!pickModeEnabled) return;
-    setHover(null);
+    setHoverImgs(null, []);
   }
 
   function onClickCapture(ev) {
@@ -194,7 +230,7 @@
     document.removeEventListener("pointerover", onPointerOver, true);
     document.removeEventListener("pointerout", onPointerOut, true);
     document.removeEventListener("click", onClickCapture, true);
-    setHover(null);
+    setHoverImgs(null, []);
   }
 
   function highlightImages(selector) {

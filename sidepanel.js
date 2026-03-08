@@ -109,6 +109,7 @@ async function downloadZip() {
   const res = await chrome.runtime.sendMessage({
     type: "DOWNLOAD_ZIP",
     urls: lastUrls,
+    pageUrl: tab.url,
   });
   if (!res?.ok) throw new Error(res?.error || "下载失败");
   setStatus("已开始下载 zip（请查看浏览器下载栏）", "ok");

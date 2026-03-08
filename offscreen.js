@@ -105,11 +105,22 @@ function dataUrlToBytes(dataUrl) {
   return { bytes: encoder.encode(text), contentType };
 }
 
-async function fetchAsBytes(url) {
+async function fetchAsBytes(url, pageUrl) {
   if (url.startsWith("data:")) {
     return dataUrlToBytes(url);
   }
-  const res = await fetch(url, { credentials: "include" });
+
+  // 构造请求头，添加 Referer 来绕过防盗链检查
+  const headers = {};
+  try {
+    const pageOrigin = new URL(pageUrl).origin;
+    headers["Referer"] = pageOrigin;
+    headers["Origin"] = pageOrigin;
+  } catch {
+    // 如果 pageUrl 无效，忽略错误
+  }
+
+  const res = await fetch(url, { credentials: "include", headers });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const contentType = res.headers.get("content-type") || "";
   const buf = await res.arrayBuffer();
@@ -194,6 +205,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg?.type === "BUILD_ZIP_URL") {
     try {
       const urls = Array.isArray(msg.urls) ? msg.urls : [];
+      const pageUrl = msg.pageUrl || "";
       if (!urls.length) throw new Error("urls 不能为空");
 
       (async () => {
@@ -205,7 +217,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
           const url = String(urls[i] || "").trim();
           if (!url) continue;
           try {
-            const { bytes, contentType } = await fetchAsBytes(url);
+            const { bytes, contentType } = await fetchAsBytes(url, pageUrl);
             let name = guessFilename(url, i, contentType);
             name = uniqueName(name, usedNames);
             files.push({ name, bytes });

@@ -36,12 +36,13 @@ async function setupOffscreenDocument(path) {
   creatingOffscreen = null;
 }
 
-async function buildZipUrlInOffscreen(urls) {
+async function buildZipUrlInOffscreen(urls, pageUrl) {
   await setupOffscreenDocument("offscreen.html");
   const res = await chrome.runtime.sendMessage({
     target: "offscreen",
     type: "BUILD_ZIP_URL",
     urls,
+    pageUrl,
   });
   if (!res?.ok || !res?.url) throw new Error(res?.error || "生成 zip 失败");
   return res;
@@ -101,7 +102,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   (async () => {
     const urls = Array.isArray(msg.urls) ? msg.urls : [];
     if (!urls.length) throw new Error("urls 不能为空");
-    const res = await buildZipUrlInOffscreen(urls);
+    const res = await buildZipUrlInOffscreen(urls, msg.pageUrl);
     const blobUrl = res.url;
     const filename = res.filename || "images.zip";
 
